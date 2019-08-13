@@ -29,24 +29,27 @@ class SmartCopy:
             self.log.log_message(f"Can't copy {self.source} to {self.destination}")
 
     def _copy_directory(self, source_dir: pathlib.Path, destination_dir: pathlib.Path):
-        for self._curr_source in source_dir.iterdir():
+        list_directory = list(source_dir.iterdir())
+
+        for i, self._curr_source in enumerate(list_directory):
             self._curr_destination = destination_dir / self._curr_source.name
+            counter = f'{i+1}/{len(list_directory)}'
 
             if self._curr_source.is_dir():
-                self.log.log_message(f'=== copy {self._curr_destination} directory ===')
+                self.log.log_message(f'=== copy {self._curr_source} directory {counter} ===')
                 self._mkdir_destination()
                 self._copy_directory(self._curr_source, self._curr_destination)
             elif self._curr_source.is_file():
+                self.log.log_message(f'copy {self._curr_source} file {counter} in {source_dir}')
                 self._copy_file()
             else:
                 self.log.log_message(f'Not file {self._curr_source}')
 
     def _copy_file(self):
-        self.log.log_message(f'copy {self._curr_source} file')
-
         if self._curr_destination.exists():
             self._source_size = self._curr_source.stat().st_size
             destination_size = self._curr_destination.stat().st_size
+            self.log.log_message(f'source file has {self._source_size} bytes')
 
             if destination_size < self._source_size:
                 self.log.log_message(f'destination file has {destination_size} bytes already')
@@ -65,7 +68,7 @@ class SmartCopy:
 
         with self._curr_destination.open('ab') as destination_file:
             while True:
-                self.log.log_message(f'copying {self._curr_source} from {position}', end='\r')
+                self.log.log_message(f'copying {self._curr_source} from {position}/{self._source_size}', end='\r')
                 chunk = source_file.read(block_size)
 
                 if not chunk:
