@@ -46,8 +46,9 @@ class SmartCopy:
                 self.log.log_message(f'Not file {self._curr_source}')
 
     def _copy_file(self):
+        self._source_size = self._curr_source.stat().st_size
+
         if self._curr_destination.exists():
-            self._source_size = self._curr_source.stat().st_size
             destination_size = self._curr_destination.stat().st_size
             self.log.log_message(f'source file has {self._source_size} bytes')
 
