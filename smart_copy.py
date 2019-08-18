@@ -61,6 +61,7 @@ class SmartCopy:
                 self.log.log_message('destination file is bigger than source')
         else:
             self._copy_file_from_position()
+        self.log.log_copied_file(self._curr_source)
 
     def _copy_file_from_position(self, position=0):
         block_size = 4096

@@ -1,18 +1,16 @@
+import pathlib
+
+
 class Logging:
     def __init__(self, log_name: str):
-        self.log_file = open(log_name, 'w')
-        self._temporary_line: str = ''
+        self._log_file = open(log_name, 'w')
 
     def __del__(self):
-        self.log_file.close()
+        self._log_file.close()
 
-    def log_message(self, message: str, end: str = '\n'):
+    def log_copied_file(self, file_path: pathlib.Path) -> None:
+        self._log_file.write(f'{str(file_path)}\n')
+
+    @staticmethod
+    def log_message(message: str, end: str = '\n') -> None:
         print(message, end=end)
-        if end == '\n':
-            if self._temporary_line:
-                self.log_file.write(self._temporary_line + message + end)
-                self._temporary_line = ''
-            else:
-                self.log_file.write(message + end)
-        else:
-            self._temporary_line = message
