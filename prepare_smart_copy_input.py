@@ -8,11 +8,12 @@ class PrepareSmartCopyInput:
 
         self.source = pathlib.Path(sys.argv[1])
         self.destination = pathlib.Path(sys.argv[2])
+        self.log_file = pathlib.Path(sys.argv[3]) if len(sys.argv) > 3 else None
 
         self._check_input()
 
     def get_input(self):
-        return self.source, self.destination
+        return self.source, self.destination, self.log_file
 
     @staticmethod
     def _check_argv():
