@@ -1,5 +1,6 @@
 import sys
 import pathlib
+import argparse
 
 
 class PrepareSmartCopyInput:
@@ -25,3 +26,15 @@ class PrepareSmartCopyInput:
         if not (self.source.exists() and self.destination.exists()):
             print('wrong path')
             sys.exit()
+
+
+parser = argparse.ArgumentParser(description='Copy files and directories with continue process ability',
+                                 prog='Smart Copy')
+parser.add_argument('source', help='source path')
+parser.add_argument('destination', help='destination path')
+parser.add_argument('-l', '--log_file')
+parser.add_argument('-f', '--only_files', action='store_true')
+parser.add_argument('-v', '--version', action='version', version='0.0.1')
+
+args = parser.parse_args(['foo', 'bar'])
+print(args)
