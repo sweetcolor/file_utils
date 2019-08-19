@@ -1,5 +1,7 @@
 import pathlib
 
+from prepare_smart_copy_input import args
+
 
 class Logging:
     LOG_PATH = 'log'
@@ -7,14 +9,15 @@ class Logging:
     def __del__(self):
         self._log_file.close()
 
-    def create_new_logging_file(self, file_name: str):
-        self._create_log_directory()
-        path = pathlib.Path(Logging.LOG_PATH, file_name)
-        open_mode = 'a' if path.exists() else 'w'
-        self._log_file = open(path, open_mode)
+        self._log_file = self.open_existing_logging_file() if args.log_file else self.create_new_logging_file()
 
-    def open_existing_logging_file(self, file_path: pathlib.Path):
-        self._log_file = file_path.open('a')
+    def create_new_logging_file(self):
+        self._create_log_directory()
+        return pathlib.Path(Logging.LOG_PATH, f'copying {args.source.name}.log').open('a')
+
+    def open_existing_logging_file(self):
+        self._check_file_path()
+        return open(args.log_file)
 
     def log_copied_file(self, file_path: pathlib.Path) -> None:
         self._log_file.write(f'{str(file_path)}\n')
@@ -22,6 +25,11 @@ class Logging:
     @staticmethod
     def log_message(message: str, end: str = '\n') -> None:
         print(message, end=end)
+
+    @staticmethod
+    def _check_file_path():
+        if not pathlib.Path(args.log_file).is_file():
+            raise Exception
 
     @staticmethod
     def _create_log_directory():

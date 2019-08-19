@@ -2,14 +2,13 @@ import time
 import pathlib
 
 from logging import Logging
-from prepare_smart_copy_input import PrepareSmartCopyInput
+from prepare_smart_copy_input import PrepareSmartCopyInput, args
 
 
 class SmartCopy:
-    def __init__(self, source: pathlib.Path, destination: pathlib.Path, log_file: pathlib.Path = None):
-        self.source = source
-        self.destination = destination
-        self.log_file = log_file
+    def __init__(self):
+        self.source = pathlib.Path(args.source)
+        self.destination = pathlib.Path(args.destination)
 
         self.time_start = time.perf_counter()
         self.log = self._create_logging()
@@ -90,14 +89,14 @@ class SmartCopy:
             self._curr_destination.mkdir()
 
     def _create_logging(self) -> Logging:
-        logging = Logging()
-        if self.log_file:
-            logging.open_existing_logging_file(self.log_file)
-        else:
-            logging.create_new_logging_file(f'copying {self.source.name}.log')
-        return logging
+        # logging = Logging()
+        # if self.log_file:
+        #     logging.open_existing_logging_file(self.log_file)
+        # else:
+        #     logging.create_new_logging_file(f'copying {self.source.name}.log')
+        return Logging()
 
 
 if __name__ == '__main__':
-    smart_copy = SmartCopy(*PrepareSmartCopyInput().get_input())
+    smart_copy = SmartCopy()
     smart_copy.copy()
