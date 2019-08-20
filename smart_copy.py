@@ -40,8 +40,11 @@ class SmartCopy:
                 self._mkdir_destination()
                 self._copy_directory(self._curr_source, self._curr_destination)
             elif self._curr_source.is_file():
-                self.log.log_message(f'copy {self._curr_source} file {counter} in {source_dir}')
-                self._copy_file()
+                if str(self._curr_source) in self.copied_files:
+                    self.log.log_message(f'{self._curr_source} file already copied, so skipped')
+                else:
+                    self.log.log_message(f'copy {self._curr_source} file {counter} in {source_dir}')
+                    self._copy_file()
             else:
                 self.log.log_message(f'Not file {self._curr_source}')
 
@@ -70,7 +73,7 @@ class SmartCopy:
 
         with self._curr_destination.open('ab') as destination_file:
             while True:
-                self.log.log_message(f'copying {self._curr_source} from {position}/{self._source_size}', end='\r')
+                self.log.log_message(f'copying {self._curr_source} from {position} / {self._source_size}', end='\r')
                 chunk = source_file.read(block_size)
 
                 if not chunk:
