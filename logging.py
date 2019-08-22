@@ -1,26 +1,33 @@
 import pathlib
+import typing
 
-from prepare_smart_copy_input import args
+from args_smart_copy import args
 
 
 class Logging:
     LOG_PATH = 'log'
 
+    def __init__(self):
+        self._create_log_directory()
+        self._log_file_path = self._setup_log_file()
+        self.copied_files = self._read_log_file() if self._log_file_path.exists() else set()
+        self._log_file = self._log_file_path.open('a')
+
     def __del__(self):
         self._log_file.close()
 
-        self._log_file = self.open_existing_logging_file() if args.log_file else self.create_new_logging_file()
-
-    def create_new_logging_file(self):
-        self._create_log_directory()
-        return pathlib.Path(Logging.LOG_PATH, f'copying {args.source.name}.log').open('a')
-
-    def open_existing_logging_file(self):
-        self._check_file_path()
-        return open(args.log_file)
-
     def log_copied_file(self, file_path: pathlib.Path) -> None:
         self._log_file.write(f'{str(file_path)}\n')
+
+    def _read_log_file(self) -> typing.Set[str]:
+        with self._log_file_path.open() as f:
+            return set(map(lambda s: s.strip(), f.readlines()))
+
+    @staticmethod
+    def _setup_log_file() -> pathlib.Path:
+        if args.log_file:
+            return pathlib.Path(args.log_file)
+        return pathlib.Path(Logging.LOG_PATH, f'{pathlib.Path(args.source).name}.log')
 
     @staticmethod
     def log_message(message: str, end: str = '\n') -> None:

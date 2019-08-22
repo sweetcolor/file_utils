@@ -2,13 +2,13 @@ import time
 import pathlib
 
 from logging import Logging
-from prepare_smart_copy_input import PrepareSmartCopyInput, args
+from args_smart_copy import args
 
 
 class SmartCopy:
     def __init__(self):
-        self.source = pathlib.Path(args.source)
-        self.destination = pathlib.Path(args.destination)
+        self.source = args.source
+        self.destination = args.destination
 
         self.time_start = time.perf_counter()
         self.log = self._create_logging()
@@ -40,7 +40,7 @@ class SmartCopy:
                 self._mkdir_destination()
                 self._copy_directory(self._curr_source, self._curr_destination)
             elif self._curr_source.is_file():
-                if str(self._curr_source) in self.copied_files:
+                if str(self._curr_source) in self.log.copied_files:
                     self.log.log_message(f'{self._curr_source} file already copied, so skipped')
                 else:
                     self.log.log_message(f'copy {self._curr_source} file {counter} in {source_dir}')
@@ -73,7 +73,8 @@ class SmartCopy:
 
         with self._curr_destination.open('ab') as destination_file:
             while True:
-                self.log.log_message(f'copying {self._curr_source} from {position} / {self._source_size}', end='\r')
+                self.log.log_message(f'copying {self._curr_source.relative_to(self.source)} from {position} '
+                                     f'/ {self._source_size}', end='\r')
                 chunk = source_file.read(block_size)
 
                 if not chunk:
@@ -91,12 +92,8 @@ class SmartCopy:
             self.log.log_message('=== make directory ===')
             self._curr_destination.mkdir()
 
-    def _create_logging(self) -> Logging:
-        # logging = Logging()
-        # if self.log_file:
-        #     logging.open_existing_logging_file(self.log_file)
-        # else:
-        #     logging.create_new_logging_file(f'copying {self.source.name}.log')
+    @staticmethod
+    def _create_logging() -> Logging:
         return Logging()
 
 
