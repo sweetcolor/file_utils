@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description='Copy files and directories with co
 parser.add_argument('source', help='source path', action=PathAction)
 parser.add_argument('destination', help='destination path', action=PathAction)
 parser.add_argument('-l', '--log_file', action=PathAction)
+parser.add_argument('-j', '--json_log_file', action=PathAction)
 parser.add_argument('-f', '--only_files', action='store_true')
 parser.add_argument('-v', '--version', action='version', version='0.1')
 

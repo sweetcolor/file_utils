@@ -1,17 +1,19 @@
 import time
 import pathlib
 
-from logging import Logging
+from logging import TextLogging
+from logging import JsonLogging
 from args_smart_copy import args
 
 
 class SmartCopy:
     def __init__(self):
-        self.source = args.source
-        self.destination = args.destination
+        self.source: pathlib.Path = args.source
+        self.destination: pathlib.Path = args.destination
 
         self.time_start = time.perf_counter()
         self.log = self._create_logging()
+        self.json_log = JsonLogging()
 
         self._curr_source: pathlib.Path = self.source
         self._curr_destination: pathlib.Path = self.destination
@@ -93,8 +95,8 @@ class SmartCopy:
             self._curr_destination.mkdir()
 
     @staticmethod
-    def _create_logging() -> Logging:
-        return Logging()
+    def _create_logging() -> TextLogging:
+        return TextLogging()
 
 
 if __name__ == '__main__':

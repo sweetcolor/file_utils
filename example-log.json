@@ -1,0 +1,10 @@
+{
+	"relative path to dir1>": true,
+	"relative path to dir2>": {
+		"relative path to inner dir1>": true,
+		"relative path to inner file1>": true,
+		"relative path to inner file2>": false
+	},
+	"relative path to file1>": false,
+	"relative path to file2>": false
+}
