@@ -12,12 +12,16 @@ class JsonLogging(_Logging):
 
     def __init__(self):
         super().__init__()
-        json_log = self.read_()
-        self.copy = json_log.get('copy', list())
-        self.skip = set(json_log.get('skip', set()))
+        self._json_log = self.read_()
+        self.copy = self._get_list('copy')
+        self.skip = self._get_list('skip')
 
     def read_(self) -> typing.Dict[str, typing.Union[bool, typing.Dict]]:
         if self._log_file_path.exists():
             with self._log_file_path.open() as f:
                 return json.load(f)
         return dict()
+
+    def _get_list(self, name):
+        # list(p.Path('/media/amd64system/Maxtor/Музика/*.mp3').parent.glob(p.Path('/media/amd64system/Maxtor/Музика/*.mp3').name))
+        return set(map(lambda x: pathlib.Path('.').glob(x), self._json_log.get(name, list())))
