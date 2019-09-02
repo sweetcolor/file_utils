@@ -12,13 +12,12 @@ class JsonLogging(_Logging):
 
     def __init__(self):
         super().__init__()
-        self.json_log = self.read_()
-
-    def __del__(self):
-        self.write()
-
-    def write(self):
-        json.dump(self.json_log, self._log_file_path)
+        json_log = self.read_()
+        self.copy = json_log.get('copy', list())
+        self.skip = set(json_log.get('skip', set()))
 
     def read_(self) -> typing.Dict[str, typing.Union[bool, typing.Dict]]:
-        return json.load(self._log_file_path) if self._log_file_path.exists() else dict()
+        if self._log_file_path.exists():
+            with self._log_file_path.open() as f:
+                return json.load(f)
+        return dict()

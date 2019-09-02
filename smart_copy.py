@@ -20,6 +20,17 @@ class SmartCopy:
         self._source_size: int = 0
 
     def copy(self):
+        if self.json_log.copy:
+            for copy_path in self.json_log.copy:
+                self.source /= copy_path
+                self.destination /= copy_path
+                self._curr_source = self.source
+                self._curr_destination = self.destination
+                self._copy_manager()
+        else:
+            self._copy_manager()
+
+    def _copy_manager(self):
         if self.source.is_dir() and self.destination.is_dir():
             self._copy_directory(self.source, self.destination)
         elif self.source.is_file() and self.destination.is_file():
@@ -31,7 +42,7 @@ class SmartCopy:
             self.log.log_message(f"Can't copy {self.source} to {self.destination}")
 
     def _copy_directory(self, source_dir: pathlib.Path, destination_dir: pathlib.Path):
-        list_directory = list(source_dir.iterdir())
+        list_directory = set(source_dir.iterdir()).difference(self.json_log.skip)
 
         for i, self._curr_source in enumerate(list_directory):
             self._curr_destination = destination_dir / self._curr_source.name
