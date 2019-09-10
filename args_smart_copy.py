@@ -1,3 +1,4 @@
+import os
 import sys
 import pathlib
 import argparse
@@ -5,6 +6,8 @@ import argparse
 
 class PathAction(argparse.Action):
     def __call__(self, custom_parser, namespace, values, option_string=None):
+        if values.startswith('~'):
+            values = values.replace('~', os.environ['HOME'], 1)
         values = pathlib.Path(values)
         setattr(namespace, self.dest, values)
 
@@ -20,9 +23,9 @@ parser.add_argument('-v', '--version', action='version', version='0.1')
 
 args = parser.parse_args()
 
-if not (args.source.exists() and args.destination.exists()):
-    print('wrong path')
-    sys.exit()
+# if not (args.source.exists() and args.destination.exists()):
+#     print('wrong path')
+#     sys.exit()
 
 if args.log_file and args.log_file.exists() and not args.log_file.is_file():
     print(f'{args.log_file} is wrong path for logging file')

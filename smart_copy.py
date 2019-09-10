@@ -1,3 +1,4 @@
+import re
 import time
 import pathlib
 
@@ -8,38 +9,64 @@ from args_smart_copy import args
 
 class SmartCopy:
     def __init__(self):
-        self.source: pathlib.Path = args.source
-        self.destination: pathlib.Path = args.destination
+        self.global_source: pathlib.Path = args.source
+        self.global_destination: pathlib.Path = args.destination
 
         self.time_start = time.perf_counter()
         self.log = self._create_logging()
         self.json_log = JsonLogging()
 
-        self._curr_source: pathlib.Path = self.source
-        self._curr_destination: pathlib.Path = self.destination
+        self.source: pathlib.Path = self.global_source
+        self.destination: pathlib.Path = self.global_destination
+        self._curr_source: pathlib.Path = self.global_source
+        self._curr_destination: pathlib.Path = self.global_destination
         self._source_size: int = 0
 
     def copy(self):
         if self.json_log.copy:
             for copy_path in self.json_log.copy:
-                self.source /= copy_path
-                self.destination /= copy_path
-                self._curr_source = self.source
-                self._curr_destination = self.destination
-                self._copy_manager()
+                self._copy_by_glob(copy_path)
         else:
-            self._copy_manager()
+            self._copy_by_glob(self.global_source)
+
+    def _copy_by_glob(self, copy_path):
+        self.global_source = self.extract_root(copy_path)
+
+        for single_copy_path in self.global_source.glob(str(copy_path.relative_to(self.global_source))):
+            self._prepare_one_source_path(single_copy_path)
+
+    def extract_root(self, copy_list):
+        index = -1
+
+        for i, parent in enumerate(copy_list.parts):
+            if re.search('[^\\\\]?[*?[]', str(parent)):
+                index = i
+                break
+
+        return copy_list.parent if index == -1 else pathlib.Path(*copy_list.parts[:index])
+
+    def _prepare_one_source_path(self, copy_path):
+        self.source = copy_path
+        self._curr_source = self.source
+        self._copy_manager()
 
     def _copy_manager(self):
-        if self.source.is_dir() and self.destination.is_dir():
+        if self.source.is_dir() and self.global_destination.is_dir():
+            self._prepare_one_destination_path(self.source)
+            self._curr_destination = self.destination
             self._copy_directory(self.source, self.destination)
-        elif self.source.is_file() and self.destination.is_file():
+        elif self.source.is_file() and self.global_destination.is_file():
             self._copy_file()
-        elif self.source.is_file() and self.destination.is_dir():
+        elif self.source.is_file() and self.global_destination.is_dir():
+            self._prepare_one_destination_path(self.source.parent)
             self._curr_destination = self.destination / self.source.name
             self._copy_file()
         else:
             self.log.log_message(f"Can't copy {self.source} to {self.destination}")
+
+    def _prepare_one_destination_path(self, source):
+        self.destination = self.global_destination / source.relative_to(self.global_source)
+        self.destination.mkdir(parents=True, exist_ok=True)
 
     def _copy_directory(self, source_dir: pathlib.Path, destination_dir: pathlib.Path):
         list_directory = set(source_dir.iterdir()).difference(self.json_log.skip)

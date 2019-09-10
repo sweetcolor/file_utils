@@ -22,6 +22,5 @@ class JsonLogging(_Logging):
                 return json.load(f)
         return dict()
 
-    def _get_list(self, name):
-        # list(p.Path('/media/amd64system/Maxtor/Музика/*.mp3').parent.glob(p.Path('/media/amd64system/Maxtor/Музика/*.mp3').name))
-        return set(map(lambda x: pathlib.Path('.').glob(x), self._json_log.get(name, list())))
+    def _get_list(self, name) -> typing.Set[pathlib.Path]:
+        return set(map(lambda x: pathlib.Path(x), self._json_log.get(name, list())))
