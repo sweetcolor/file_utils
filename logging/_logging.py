@@ -17,7 +17,7 @@ class _Logging(abc.ABC):
     def _setup_log_file(cls) -> pathlib.Path:
         if cls.ARG_LOG_FILE:
             return pathlib.Path(cls.ARG_LOG_FILE)
-        return pathlib.Path(cls.LOG_PATH, f'{pathlib.Path(args.source).name}.{cls.EXTENSION}')
+        return pathlib.Path(cls.LOG_PATH, f'{pathlib.Path(args.source[0]).name}.{cls.EXTENSION}')
 
     @classmethod
     def _create_log_directory(cls) -> None:
