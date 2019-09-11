@@ -28,8 +28,9 @@ parser.add_argument('destination', help='destination path', action=PathAction)
 parser.add_argument('-l', '--log_file', action=PathAction)
 parser.add_argument('-j', '--json_log_file', action=PathAction)
 parser.add_argument('-e', '--exist_log_file', action=PathAction)
+parser.add_argument('-c', '--create_folder', action='store_true')
 parser.add_argument('-f', '--only_files', action='store_true')
-parser.add_argument('-v', '--version', action='version', version='0.1')
+parser.add_argument('-v', '--version', action='version', version='0.4.1')
 
 args = parser.parse_args()
 

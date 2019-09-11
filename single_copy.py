@@ -20,8 +20,9 @@ class SingleCopy:
 
     def copy_manager(self):
         if self.source.is_dir() and self.destination.is_dir():
-            self.destination /= self.source.name
-            self.destination.mkdir(parents=True, exist_ok=True)
+            if args.create_folder:
+                self.destination /= self.source.name
+                self.destination.mkdir(parents=True, exist_ok=True)
 
             if self.json_log.copy:
                 for copy_path in self.json_log.copy:
@@ -52,7 +53,7 @@ class SingleCopy:
             self._curr_destination = destination_dir / self._curr_source.name
             counter = f'{i+1}/{len(list_directory)}'
 
-            if self._curr_source.is_dir():
+            if self._curr_source.is_dir() and not args.only_files:
                 self.log.log_message(f'=== copy {self._curr_source} directory {counter} ===')
                 self._curr_destination.mkdir(parents=True, exist_ok=True)
                 self._copy_directory(self._curr_source, self._curr_destination)
